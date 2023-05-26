@@ -9,7 +9,9 @@ notes:      1. possible bugs with rotating ships
             2. for quick ship placement, reccomended to paste when first ship input promp shows up: AA1VNYBA2VNYSA3VNYCA4VNYDA5VNY               
                yup, its on purpose
             3. windows (even 11) and linux supported, compile using the supplied script
-            4. on row 745 I left a debug so enemy ships are visible, this is as close as it gets to having cheats
+            4. on row 773 I left a debug so enemy ships are visible, this is as close as it gets to having cheats
+cheats: fire upon all - enter into console once you get first coordinates: A1A2A3A4A5A6A7A8A9B1B2B3B4B5B6B7B8B9C1C2C3C4C5C6C7C8C9D1D2D3D4D5D6D7D8D9E1E2E3E4E5E6E7E8E9F1F2F3F4F5F6F7F8F9G1G2G3G4G5G6G7G8G9H1H2H3H4H5H6H7H8H9I1I2I3I4I5I6I7I8I9
+        see all ships - see note 4
 */
 
 #ifdef _WIN32
@@ -513,7 +515,7 @@ int player_guess(int rows, int cols, int *fire_x, int *fire_y, char**board){
         printf("Coordinates are not on the battlefield, fire mission denied!\n");
         return 1;
     }
-    else if(board[y][x-1]=='X'){
+    else if(board[y][x]=='X'){
         printf("Entered coordinate has already been fired upon, fire mission denied!\n");
         return 1;
     }
@@ -544,8 +546,8 @@ void p_fire(int fire_x, int fire_y, char **board, char p_gueeses[][2], int p_tur
         if(board[fire_y][fire_x]==' '){       //water hit
             printf("Shot did not hit anything on the coordinates %c%d!\n",fire_y+65,fire_x+1);
             board[fire_y][fire_x] = 'X';      //marks the spot
-            p_gueeses[p_turns][0] = fire_y + 65;
-            p_gueeses[p_turns][1] = fire_x + 48;
+            p_gueeses[p_turns][0] = fire_y + 'A';
+            p_gueeses[p_turns][1] = fire_x + '1';
              
         }
         else{
@@ -553,7 +555,7 @@ void p_fire(int fire_x, int fire_y, char **board, char p_gueeses[][2], int p_tur
             printf("Direct hit upon ship %c on coordinates %c%d!\n",hit,fire_y+65,fire_x+1);
             board[fire_y][fire_x] = 'X';      //marks the spot
             p_gueeses[p_turns][0] = fire_y + 'A';
-            p_gueeses[p_turns][1] = fire_x + 48;
+            p_gueeses[p_turns][1] = fire_x + '1';
         }
 
 }
@@ -705,17 +707,7 @@ int main(){
                 continue;
                 break;
         }
-        /*
-        for(int j = 0; j<5;j++){ //from all 5 possibilities
-            if(ships[j].symbol == toupper(shipselect)){
-                ssi = j; //ship select index
-                
-            }
-        }
-        if(ssi){
-            p_valsel = 1;
-        }
-        */
+
         if(ships[ssi].size>cols||ships[ssi].size>rows){
             printf("Ship would not fit the board, select something else.\n");   //not used
             i--;
@@ -779,20 +771,20 @@ int main(){
         p_fire(fire_x,fire_y,opponent_board,p_guesses,p_turns);
         
         //uncomment if you want to see enemy ships
-        
+        /*
         printf("DEBUG:\n");
         print_board(opponent_board,rows,cols);
-        
+        */
         
         winner = turn;
         game = game_end_check(opponent_board, rows, cols);
         if(game<1){
             break;           
         }
-        PAUSE(3);
+        //PAUSE(3);
         printf("\033[31mEnemy's turn..\033[0m\n");
         turn = 'O';
-        PAUSE(3);
+        //PAUSE(3);
 
         o_shot = 0;
         while(o_shot != 1){
@@ -804,7 +796,7 @@ int main(){
         dead_ship_check(player_board,ships,rows,cols);//checks players dead ships
         winner = turn; 
         game = game_end_check(player_board, rows, cols);
-        PAUSE(5);
+        //AUSE(5);
         CLEAR_SCREEN();
         p_turns++;
     }
@@ -822,5 +814,7 @@ int main(){
     }
     free(player_board);
     free(opponent_board);
-   return 0;
+
+    scanf(" ?");
+    return 0;
 }
