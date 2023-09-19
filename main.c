@@ -282,7 +282,7 @@ int place_ship(char** board, int rows, int cols, int size, char symbol) {
 
 
         
-        //validation orientation
+        //validation of orientation
     
 
         
@@ -302,7 +302,7 @@ int place_ship(char** board, int rows, int cols, int size, char symbol) {
                     if(valid == 0){
                         break;
                     }
-                    if (board[y][i]!= ' '){
+                    if (board[y][i]!= ' '){ //fucked up here
                         printf("Placed ship is blocked by another ship on %c%d, try different orientation.\n", y+65,i+1);
                         valid = 0;
                         continue;
@@ -322,6 +322,10 @@ int place_ship(char** board, int rows, int cols, int size, char symbol) {
                 }
             }       
             
+            if(valid == 0){
+                continue;
+            }
+
             if(neg_dir == 'N'){
                 for(int i = x; i < x + size;i++){   //placement in positive direction 
                     board[y][i] = symbol;
@@ -374,7 +378,7 @@ int place_ship(char** board, int rows, int cols, int size, char symbol) {
                 }
             }
 
-            if(valid ==0){
+            if(valid == 0){
                 continue;
             }
 
@@ -634,7 +638,8 @@ int main(){
     printf("\n\nIf you understand the rules, press \033[1mENTER\033[0m\n");
     scanf("?");
     CLEAR_SCREEN();
-    int rows, cols, p_valsel, o_sel, fire_x, fire_y, p_shot, o_shot, ssi, area;
+    int rows, cols, p_valsel, o_sel, fire_x, fire_y, p_shot, o_shot, ssi;
+
     
     //ship symbol , size, full name, selected/unselected
     Ship ships[] = {
@@ -652,7 +657,7 @@ int main(){
    //hardcoded so the board is 9x9
     cols = 9;
     rows = 9;
-    area = cols * rows;
+    const int area = cols * rows;
     char p_guesses[area][2]; //list of guess
 
     //generation of boards
