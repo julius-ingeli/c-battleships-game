@@ -652,6 +652,7 @@ int game_end_check(char**board, int rows, int cols){    //check if the game is o
 }
 
 int main(){
+    int rows, cols, p_valsel, o_sel, fire_x, fire_y, p_shot, o_shot, ssi;
     CLEAR_SCREEN();
     printf("Welcome player, you will play a game of \033[034mBattleships\033[0m, built in \033[38;2;0;0;255;48;2;255;255;255mC\033[0m, made by \033[35mJulius Ingeli\033[0m\n");
     printf("\033[031m!!!!READ CAREFULLY!!!!\033[0m\n");
@@ -667,9 +668,26 @@ int main(){
     printf("\n\nIf you understand the rules, press \033[1mENTER\033[0m\n");
     scanf("?");
     CLEAR_SCREEN();
-    int rows, cols, p_valsel, o_sel, fire_x, fire_y, p_shot, o_shot, ssi;
-
     
+    char t_adjust;
+    int p_shootTime, o_shootTime;
+    p_shootTime = o_shootTime = 3;
+
+    printf("Do you want to adjust time between turns? Y/N\n");
+    scanf(" %c",&t_adjust);
+    t_adjust = toupper(t_adjust);
+    if(t_adjust == 'Y'){
+        printf("Time adjustment for player turn: ");
+        scanf(" %d", &p_shootTime);
+        printf("Time adjustment for opponent turn: ");
+        scanf(" %d", &o_shootTime);
+    }
+    else{
+        
+    }
+    printf("DEBUG: %d %d", p_shootTime, o_shootTime);
+    PAUSE(1);
+    CLEAR_SCREEN();
     //ship symbol , size, full name, selected/unselected
     Ship ships[] = {
         {'A', 5, 0, "Aircraft carrier",0},    
@@ -812,20 +830,21 @@ int main(){
         p_fire(fire_x,fire_y,opponent_board,guess_board);
         dead_ship_check(opponent_board,ships,rows,cols,turn);
         //uncomment if you want to see enemy ships
-        
+        /*
         printf("DEBUG:\n");
         print_board(opponent_board,rows,cols);
-        
-        
+        PAUSE(1);
+        */
+
         winner = turn;
         game = game_end_check(opponent_board, rows, cols);
         if(game<1){
             break;           
         }
-        PAUSE(3);
+        PAUSE(p_shootTime);
         printf("\033[31mEnemy's turn..\033[0m\n");
         turn = 'O';
-        PAUSE(3);
+
 
         o_shot = 0;
         while(o_shot != 1){
@@ -837,7 +856,7 @@ int main(){
         dead_ship_check(player_board,ships,rows,cols,turn);//checks players dead ships
         winner = turn; 
         game = game_end_check(player_board, rows, cols);
-        PAUSE(5);
+        PAUSE(o_shootTime);
         CLEAR_SCREEN();
         p_turns++;
     }
