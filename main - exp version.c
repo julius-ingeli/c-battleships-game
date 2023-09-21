@@ -147,6 +147,15 @@ void print_board(char** board, int rows, int cols) {
                         draw_right_bord(i,&r_border_f);
                     }
                     break;
+                case 'O':
+                    c_miss();
+                    printf("%c ", board[i][j]);
+                    c_reset();
+                    if(r_border_f == 1){
+                        draw_right_bord(i,&r_border_f);
+                    }
+                    break;
+
                 case 'A':
                     c_carrier();
                     printf("%c ", board[i][j]);
@@ -556,7 +565,8 @@ int opponent_guess(int rows, int cols, int *fire_x, int *fire_y, char**board){
 }
 
 
-void p_fire(int fire_x, int fire_y, char **board, char p_gueeses[][2], int p_turns){
+
+void p_fire(int fire_x, int fire_y, char **board, char p_gueeses[][2], int p_turns, char** g_board){
     char hit;
 
         if(board[fire_y][fire_x]==' '){       //water hit
@@ -564,6 +574,7 @@ void p_fire(int fire_x, int fire_y, char **board, char p_gueeses[][2], int p_tur
             board[fire_y][fire_x] = 'X';      //marks the spot
             p_gueeses[p_turns][0] = fire_y + 'A';
             p_gueeses[p_turns][1] = fire_x + '1';
+            g_board[fire_y][fire_x] = 'O';
              
         }
         else{
@@ -572,6 +583,7 @@ void p_fire(int fire_x, int fire_y, char **board, char p_gueeses[][2], int p_tur
             board[fire_y][fire_x] = 'X';      //marks the spot
             p_gueeses[p_turns][0] = fire_y + 'A';
             p_gueeses[p_turns][1] = fire_x + '1';
+            g_board[fire_y][fire_x] = 'X';
         }
 
 }
@@ -783,7 +795,7 @@ int main(){
         printf("\033[032mYour ships:\n\033[0m");
         print_board(player_board,rows,cols);
         p_shot = 0;
-        printf("Fired coordinates:");
+        printf("Fired coordinates:\n");
         print_board(guess_board,rows,cols);
         for(int i = 0;i<p_turns;i++){
             printf("%c%c ",p_guesses[i][0],p_guesses[i][1]);
@@ -794,7 +806,7 @@ int main(){
                 p_shot = 1;
             }
         }
-        p_fire(fire_x,fire_y,opponent_board,p_guesses,p_turns);
+        p_fire(fire_x,fire_y,opponent_board,p_guesses,p_turns,guess_board);
         
         //uncomment if you want to see enemy ships
         /*

@@ -9,7 +9,7 @@ A simple game of battleships written in C
 
 ## PLANNED FEATURES
 
-- visual representation of fired upon coordinates - *note: WIP*
+- ~~visual representation of fired upon coordinates~~ *added 21/09/23 11:30*
 
 - less time between turns - *note: this should be variabled by player how long they want the turns to be ig*
 
@@ -17,3 +17,6 @@ A simple game of battleships written in C
 
 - ~~ship sizes disclosed in the ship selection screen~~ *added 21/09/23 10:22 after playtester suggestion*
 
+- ~~dead ship checks *note: WIP*~~ *added 21/09/23 11:40 after being bored*
+
+- cheat codes
