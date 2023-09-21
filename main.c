@@ -31,7 +31,8 @@ typedef struct{
     int size;
     int selected;
     char fullName[MAX_NAME];
-    int dead;
+    int p_dead;
+    int o_dead;
 }Ship;
 
 //colors and graphics
@@ -566,66 +567,86 @@ int opponent_guess(int rows, int cols, int *fire_x, int *fire_y, char**board){
 
 
 
-void p_fire(int fire_x, int fire_y, char **board, char** g_board){
+int p_fire(int fire_x, int fire_y, char **board, char** g_board){
     char hit;
 
         if(board[fire_y][fire_x]==' '){       //water hit
             printf("Shot did not hit anything on the coordinates %c%d!\n",fire_y+65,fire_x+1);
             board[fire_y][fire_x] = 'X';      //marks the spot on enemy board
             g_board[fire_y][fire_x] = 'O';    //marks miss on the guess board  
-             
+            return 1; 
         }
         else{
             hit = board[fire_y][fire_x];      //hit
             printf("Direct hit upon ship %c on coordinates %c%d!\n",hit,fire_y+65,fire_x+1);
             board[fire_y][fire_x] = 'X';      //marks the spot on enemy board
             g_board[fire_y][fire_x] = 'X';    //marks the hit on guess board
+            return 0;
         }
 
 }
 
-void o_fire(int fire_x, int fire_y, char **board){ //function overloading, declaring two same functions with different parameters
+int o_fire(int fire_x, int fire_y, char **board){ //function overloading, declaring two same functions with different parameters
     char hit;
 
     if(board[fire_y][fire_x]==' '){        
         printf("Enemy missed their shot at coordinates %c%d!\n",fire_y+65,fire_x+1);
-        board[fire_y][fire_x] = 'X';  
+        board[fire_y][fire_x] = 'X'; 
+        return 1; 
     }
     else{
         hit = board[fire_y][fire_x];
         printf("Enemy hit our %c ship on coordinates %c%d!\n",hit,fire_y+65,fire_x+1);
         board[fire_y][fire_x] = 'X';
+        return 0;
     }
 }
 
 
 void dead_ship_check(char**board, Ship ships[], int rows, int cols, char turn){ //check of destroyed ships by the enemy //unused function
     char chk_ship;
-    for(int i = 0; i < 5; i++){
-        int hp_ship = 0;
-        chk_ship = ships[i].symbol;
-        if(ships[i].dead == 1){
-            continue;
-        }
-        for(int j = 0; j<rows;j++){
-            for(int k = 0; k < cols; k++){
-                if(board[j][k]==chk_ship){
-                    hp_ship++;
+    if(turn == 'P'){
+        for(int i = 0; i < 5; i++){
+	        int hp_ship = 0;
+            chk_ship = ships[i].symbol;
+            if(ships[i].p_dead == 1 || ships[i].o_dead == 1){
+                continue;
+            }
+            for(int j = 0; j<rows;j++){
+                for(int k = 0; k < cols; k++){
+                    if(board[j][k]==chk_ship){
+                        hp_ship++;
+                    }
                 }
             }
-        }
-        if(hp_ship<1){
-            if(turn == 'P'){
+            
+            if(hp_ship<1){
                 printf("You have destroyed the enemy %s!\n",ships[i].fullName);
-                ships[i].dead = 1;
+                ships[i].o_dead = 1;
                 PAUSE(2);
+            }   
+        }
+    }
+    else{ //turn == 'O'
+        for(int i = 0; i < 5; i++){
+            int hp_ship = 0;
+            chk_ship = ships[i].symbol;
+            if(ships[i].p_dead == 1 || ships[i].p_dead == 1){
+                continue;
             }
-            else{
-                printf("%s was destroyed by the enemy!\n",ships[i].fullName);
-                ships[i].dead = 1;
+            for(int j = 0; j<rows;j++){
+                for(int k = 0; k < cols; k++){
+                    if(board[j][k]==chk_ship){
+                        hp_ship++;
+                    }
+                }
+            }
+            
+            if(hp_ship<1){
+                printf("Our %s has been destroyed by the enemy!\n",ships[i].fullName);
+                ships[i].o_dead = 1;
                 PAUSE(2);
-            }
-
+            }   
         }
     }
 
@@ -681,20 +702,20 @@ int main(){
         scanf(" %d", &p_shootTime);
         printf("Time adjustment for opponent turn: ");
         scanf(" %d", &o_shootTime);
+        PAUSE(1);
     }
     else{
-        
+        printf("Cont..\n");
     }
-    printf("DEBUG: %d %d", p_shootTime, o_shootTime);
-    PAUSE(1);
+    
     CLEAR_SCREEN();
     //ship symbol , size, full name, selected/unselected
     Ship ships[] = {
-        {'A', 5, 0, "Aircraft carrier",0},    
-        {'B', 4, 0, "Battleship",0},   
-        {'S', 3, 0, "Submarine",0},
-        {'C', 3, 0, "Cruiser",0},  
-        {'D', 2, 0, "Destroyer",0}    
+        {'A', 5, 0, "Aircraft carrier",0,0},    
+        {'B', 4, 0, "Battleship",0,0},   
+        {'S', 3, 0, "Submarine",0,0},
+        {'C', 3, 0, "Cruiser",0,0},  
+        {'D', 2, 0, "Destroyer",0,0}    
     };
     char shipselect, turn, winner;
 
@@ -827,14 +848,15 @@ int main(){
                 p_shot = 1;
             }
         }
-        p_fire(fire_x,fire_y,opponent_board,guess_board);
-        dead_ship_check(opponent_board,ships,rows,cols,turn);
+        if(p_fire(fire_x,fire_y,opponent_board,guess_board)==0){
+            dead_ship_check(opponent_board,ships,rows,cols,turn); //checks opponents dead ships
+        }
         //uncomment if you want to see enemy ships
-        /*
+        
         printf("DEBUG:\n");
         print_board(opponent_board,rows,cols);
         PAUSE(1);
-        */
+        
 
         winner = turn;
         game = game_end_check(opponent_board, rows, cols);
@@ -852,8 +874,9 @@ int main(){
                 o_shot = 1;
             }
         }
-        o_fire(fire_x,fire_y,player_board);
-        dead_ship_check(player_board,ships,rows,cols,turn);//checks players dead ships
+        if(o_fire(fire_x,fire_y,player_board)==0){;
+            dead_ship_check(player_board,ships,rows,cols,turn); //checks players dead ships
+        }
         winner = turn; 
         game = game_end_check(player_board, rows, cols);
         PAUSE(o_shootTime);
