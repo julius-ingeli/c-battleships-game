@@ -681,11 +681,12 @@ int main(){
         
         for(int l = 0; l < 5; l++){
             if(ships[l].selected != 1){
-                printf("%c - %s\n", ships[l].symbol, ships[l].fullName);
+                printf("%c - %s, Length - %d\n", ships[l].symbol, ships[l].fullName, ships[l].size);
             }
         }
 
         scanf(" %c",&shipselect);
+        shipselect = toupper(shipselect);
         switch (shipselect){
             case 'A':
                 ssi = 0;
@@ -789,10 +790,10 @@ int main(){
         if(game<1){
             break;           
         }
-        //PAUSE(3);
+        PAUSE(3);
         printf("\033[31mEnemy's turn..\033[0m\n");
         turn = 'O';
-        //PAUSE(3);
+        PAUSE(3);
 
         o_shot = 0;
         while(o_shot != 1){
