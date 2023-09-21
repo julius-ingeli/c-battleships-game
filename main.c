@@ -433,9 +433,11 @@ int place_ship(char** board, int rows, int cols, int size, char symbol) {
             orient_pass = 0;
             printf("Keep the ship type? Y/N\n"); //In case the ship is not desirable
             scanf(" %c",&ship_retain);
+            ship_retain = toupper(ship_retain);
             if(ship_retain!='Y'&&ship_retain!='N'){
-                printf("Incorrect input, returning back to orientation selection..\n");
-                break;    
+                printf("Incorrect input, returning back to ship selection..\n");
+                PAUSE(3);
+                return 1;    
             }
             else{
                 if(ship_retain=='Y'){
@@ -726,6 +728,7 @@ int main(){
             if(ps==1){ //case that the ship position is not confirmed but the ship selection should retain
                 ships[ssi].selected = 0;
                 i--;
+                CLEAR_SCREEN();
                 continue;
             }
             CLEAR_SCREEN();
