@@ -9,11 +9,11 @@ A simple game of battleships written in C
 
 ## PLANNED FEATURES
 
-- visual representation of fired upon coordinates
+- visual representation of fired upon coordinates - *note: WIP*
 
-- less time between turns
+- less time between turns - *note: this should be variabled by player how long they want the turns to be ig*
 
--  uncasesensitivitize(???) the ship selection
+- ~~uncasesensitivitize(???) the ship selection~~ *added 21/09/23 10:23 after playtester suggestion*
 
-- ship sizes disclosed in the ship selection screen
+- ~~ship sizes disclosed in the ship selection screen~~ *added 21/09/23 10:22 after playtester suggestion*
 

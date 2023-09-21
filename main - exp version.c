@@ -43,6 +43,9 @@ void c_reset() {
 void c_hit(){
     printf("\033[7;31m");
 }
+void c_miss(){
+    printf("\033[7;37m");
+}
 void c_water(){
     printf("\033[7;94m");
 }
@@ -84,7 +87,7 @@ int rng(int min, int max) {
     return rand() % (max - min + 1) + min; //standard rng function
 }
 
-void init_board(char** player_board, char** opponent_board, int rows, int cols) {
+void init_board(char** player_board, char** opponent_board,char** guess_board ,int rows, int cols) {
     //player board
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
@@ -98,7 +101,12 @@ void init_board(char** player_board, char** opponent_board, int rows, int cols) 
             opponent_board[i][j] = ' ';
         }
     }
-
+    // guess board
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            guess_board[i][j] = ' ';
+        }
+    }
     
 }
 void print_board(char** board, int rows, int cols) {
@@ -665,13 +673,18 @@ int main(){
     char p_guesses[area][2]; //list of guess
 
     //generation of boards
+    //Y coords
     char** player_board = (char**) malloc(rows * sizeof(char*)); //player's
     char** opponent_board = (char**) malloc(rows * sizeof(char*)); //enemy's
+    char** guess_board = (char**) malloc(rows * sizeof(char*)); //guess board's
+    //X coords
     for (int i = 0; i < rows; i++) {
         player_board[i] = (char*) malloc(cols * sizeof(char));  
         opponent_board[i] = (char*) malloc(cols * sizeof(char));
+        guess_board[i] = (char*) malloc(cols * sizeof(char));
+        
     }
-    init_board(player_board, opponent_board, rows, cols); //fills the board with water
+    init_board(player_board, opponent_board,guess_board ,rows, cols); //fills the board with water
     
     
     //selection and positioning of player's ships
@@ -767,9 +780,11 @@ int main(){
     while (game == 1)
     {
         turn = 'P';
+        printf("\033[032mYour ships:\n\033[0m");
         print_board(player_board,rows,cols);
         p_shot = 0;
         printf("Fired coordinates:");
+        print_board(guess_board,rows,cols);
         for(int i = 0;i<p_turns;i++){
             printf("%c%c ",p_guesses[i][0],p_guesses[i][1]);
         }
@@ -807,7 +822,7 @@ int main(){
         dead_ship_check(player_board,ships,rows,cols);//checks players dead ships
         winner = turn; 
         game = game_end_check(player_board, rows, cols);
-        //AUSE(5);
+        PAUSE(5);
         CLEAR_SCREEN();
         p_turns++;
     }
