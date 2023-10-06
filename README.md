@@ -19,4 +19,7 @@ A simple game of battleships written in C
 
 - ~~dead ship checks *note: WIP*~~ *added 21/09/23 11:40 after being bored*
 
-- cheat codes
+- ~~fix long time between checks~~ *fixed 06/10/23 15:27*
+
+- ~~cheat codes~~ *added 06/10/23 15:27*
+ 

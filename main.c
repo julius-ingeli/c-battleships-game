@@ -4,6 +4,7 @@
 #include <time.h>
 #include <ctype.h>
 
+
 /*
 notes:      1. possible bugs with rotating ships
             2. for quick ship placement, reccomended to paste when first ship input promp shows up: AA1VNYBA2VNYSA3VNYCA4VNYDA5VNY               
@@ -35,7 +36,13 @@ typedef struct{
     int o_dead;
 }Ship;
 
+typedef struct{
+    char code[8];
+    char enablemsg[100];
+    int enabled;
+}Cheat;
 //colors and graphics
+
 
 void c_reset() {
     printf("\033[0m");
@@ -74,6 +81,27 @@ void c_destroyer() {
     printf("\033[7;97m");
 }
 
+void cheat_input(Cheat cheats[]){
+    char cheatinput[8];
+    int cheat = 1;
+    printf("Do you know any cheat codes?\n");
+    while(cheat == 1){
+        fgets(cheatinput,sizeof(cheatinput),stdin);
+        cheatinput[strcspn(cheatinput,"\n")] = '\0';
+        for(int i = 0; i<1;i++){
+            if(strcmp(cheatinput,cheats[i].code)==0){
+                printf("%s",cheats[i].enablemsg);
+                cheats[i].enabled = 1;
+                cheat =  0;
+                PAUSE(2);
+            }
+            else if(strcmp(cheatinput,"n")==0||strcmp(cheatinput,"N")==0){
+                cheat = 0;
+            }
+        }
+
+    }
+}
 
 void draw_right_bord(int i, int *r_border_f){
         c_coordindex();
@@ -605,10 +633,12 @@ int o_fire(int fire_x, int fire_y, char **board){ //function overloading, declar
 
 void dead_ship_check(char**board, Ship ships[], int rows, int cols, char turn){ //check of destroyed ships by the enemy //unused function
     char chk_ship;
+    //printf("DEBUG: Init dead ship check...\n");
     if(turn == 'P'){
         for(int i = 0; i < 5; i++){
 	        int hp_ship = 0;
             chk_ship = ships[i].symbol;
+            //printf("Checking %c..\n", ships[i].symbol);
             if(ships[i].p_dead == 1 || ships[i].o_dead == 1){
                 continue;
             }
@@ -624,6 +654,7 @@ void dead_ship_check(char**board, Ship ships[], int rows, int cols, char turn){ 
                 printf("You have destroyed the enemy %s!\n",ships[i].fullName);
                 ships[i].o_dead = 1;
                 PAUSE(2);
+                break;
             }   
         }
     }
@@ -631,6 +662,7 @@ void dead_ship_check(char**board, Ship ships[], int rows, int cols, char turn){ 
         for(int i = 0; i < 5; i++){
             int hp_ship = 0;
             chk_ship = ships[i].symbol;
+            //printf("Checking %c..\n", ships[i].symbol);
             if(ships[i].p_dead == 1 || ships[i].p_dead == 1){
                 continue;
             }
@@ -646,6 +678,7 @@ void dead_ship_check(char**board, Ship ships[], int rows, int cols, char turn){ 
                 printf("Our %s has been destroyed by the enemy!\n",ships[i].fullName);
                 ships[i].o_dead = 1;
                 PAUSE(2);
+                break;
             }   
         }
     }
@@ -654,25 +687,46 @@ void dead_ship_check(char**board, Ship ships[], int rows, int cols, char turn){ 
 
 
 
-int game_end_check(char**board, int rows, int cols){    //check if the game is over
-    int hpcount = 0;
-    for(int i = 0; i<rows;i++){
-        for(int j = 0; j < cols; j++)
-        {
-            if(board[i][j] != 'X' && board[i][j] != ' '){
-                hpcount++;
+int game_end_check(Ship ships[],char turn){    //check if the game is over
+    int shpcount = 0;
+    //printf("DEBUG: performing dead ship check for %c...\n", turn);
+    if(turn == 'P'){
+        for(int i = 0; i < 5;i++){
+            if(ships[i].o_dead == 0){
+                shpcount++;
             }
         }
-        
+        if (shpcount<1){
+            //printf("DEBUG:dead ship check for %c complete, dead.\n", turn);
+            return 0; // game over
+        }
+        else{
+            //printf("DEBUG:dead ship check for %c complete, not dead.\n", turn);
+            return 1; //game on
+        }
     }
-    if(hpcount>0){
-        return 1; //game on
+    else{ //turn == 'O';
+        for(int i = 0; i < 5;i++){
+            if(ships[i].o_dead == 0){
+                shpcount++;
+            }
+        }
+        if (shpcount<1){
+            //printf("DEBUG:dead ship check for %c complete, dead.\n", turn);
+            return 0;
+        }
+        else{
+            //printf("DEBUG:dead ship check for %c complete, not dead.\n", turn);
+            return 1;
+        }
     }
-
-    return 0; //game over
+    
 }
 
 int main(){
+    Cheat cheats[] = {
+        {"RADAR", "Radar mode enabled, you will be able to see enemy ships briefly.", 0},
+    };
     int rows, cols, p_valsel, o_sel, fire_x, fire_y, p_shot, o_shot, ssi;
     CLEAR_SCREEN();
     printf("Welcome player, you will play a game of \033[034mBattleships\033[0m, built in \033[38;2;0;0;255;48;2;255;255;255mC\033[0m, made by \033[35mJulius Ingeli\033[0m\n");
@@ -707,7 +761,11 @@ int main(){
     else{
         printf("Cont..\n");
     }
-    
+    CLEAR_SCREEN();
+
+    cheat_input(cheats);
+
+
     CLEAR_SCREEN();
     //ship symbol , size, full name, selected/unselected
     Ship ships[] = {
@@ -851,15 +909,17 @@ int main(){
         if(p_fire(fire_x,fire_y,opponent_board,guess_board)==0){
             dead_ship_check(opponent_board,ships,rows,cols,turn); //checks opponents dead ships
         }
-        //uncomment if you want to see enemy ships
+       
         
-        printf("DEBUG:\n");
+        if(cheats[0].enabled == 1){
+        printf("Enemy ships:\n");
         print_board(opponent_board,rows,cols);
-        PAUSE(1);
+        }
+        PAUSE(p_shootTime);
         
 
         winner = turn;
-        game = game_end_check(opponent_board, rows, cols);
+        game = game_end_check(ships,turn);
         if(game<1){
             break;           
         }
@@ -878,7 +938,7 @@ int main(){
             dead_ship_check(player_board,ships,rows,cols,turn); //checks players dead ships
         }
         winner = turn; 
-        game = game_end_check(player_board, rows, cols);
+        game = game_end_check(ships, turn);
         PAUSE(o_shootTime);
         CLEAR_SCREEN();
         p_turns++;
